@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-monitoring-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: system-monitoring
+  template:
+    metadata:
+      labels:
+        app: system-monitoring
+    spec:
+      containers:
+        - name: system-monitoring-app
+          image: robinthakur00/system-monitoring:v1
+          ports:
+            - containerPort: 5000
+          env:
+            - name: FLASK_APP
+              value: 'app.py'
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-monitoring-service
+spec:
+  selector:
+    app: system-monitoring
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: NodePort
